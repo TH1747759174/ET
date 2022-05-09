@@ -4,7 +4,7 @@ namespace ET
 {
     public class AppStartInitFinish_CreateLoginUI : AEvent<EventType.AppStartInitFinish>
     {
-        protected override void Run(EventType.AppStartInitFinish args)
+        protected override async void Run(EventType.AppStartInitFinish args)
         {
             UIHelper.Create(args.ZoneScene, UIType.UILogin, UILayer.Mid).Coroutine();
 
@@ -15,6 +15,8 @@ namespace ET
             computer.AddComponent<KeyBoardComponent>();
             computer.AddComponent<MouseComponent>();
             computer.Start();
+            await TimerComponent.Instance.WaitAsync(2000);
+            computer.Dispose();
         }
     }
 }

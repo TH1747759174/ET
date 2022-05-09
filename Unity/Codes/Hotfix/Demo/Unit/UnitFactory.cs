@@ -6,43 +6,91 @@ namespace ET
     {
         public static Unit Create(Scene currentScene, UnitInfo unitInfo)
         {
-	        UnitComponent unitComponent = currentScene.GetComponent<UnitComponent>();
-	        Unit unit = unitComponent.AddChildWithId<Unit, int>(unitInfo.UnitId, unitInfo.ConfigId);
-	        unitComponent.Add(unit);
-	        
-	        unit.Position = new Vector3(unitInfo.X, unitInfo.Y, unitInfo.Z);
-	        unit.Forward = new Vector3(unitInfo.ForwardX, unitInfo.ForwardY, unitInfo.ForwardZ);
-	        
-	        NumericComponent numericComponent = unit.AddComponent<NumericComponent>();
-	        for (int i = 0; i < unitInfo.Ks.Count; ++i)
-	        {
-		        numericComponent.Set(unitInfo.Ks[i], unitInfo.Vs[i]);
-	        }
-	        
-	        unit.AddComponent<MoveComponent>();
-	        if (unitInfo.MoveInfo != null)
-	        {
-		        if (unitInfo.MoveInfo.X.Count > 0)
-		        {
-			        using (ListComponent<Vector3> list = ListComponent<Vector3>.Create())
-			        {
-				        list.Add(unit.Position);
-				        for (int i = 0; i < unitInfo.MoveInfo.X.Count; ++i)
-				        {
-					        list.Add(new Vector3(unitInfo.MoveInfo.X[i], unitInfo.MoveInfo.Y[i], unitInfo.MoveInfo.Z[i]));
-				        }
+            UnitComponent unitComponent = currentScene.GetComponent<UnitComponent>();
+            Unit unit = unitComponent.AddChildWithId<Unit, int>(unitInfo.UnitId, unitInfo.ConfigId);
+            unitComponent.Add(unit);
 
-				        unit.MoveToAsync(list).Coroutine();
-			        }
-		        }
-	        }
+            unit.Position = new Vector3(unitInfo.X, unitInfo.Y, unitInfo.Z);
+            unit.Forward = new Vector3(unitInfo.ForwardX, unitInfo.ForwardY, unitInfo.ForwardZ);
 
-	        unit.AddComponent<ObjectWait>();
+            NumericComponent numericComponent = unit.AddComponent<NumericComponent>();
+            for (int i = 0; i < unitInfo.Ks.Count; ++i)
+            {
+                numericComponent.Set(unitInfo.Ks[i], unitInfo.Vs[i]);
+            }
 
-	        unit.AddComponent<XunLuoPathComponent>();
-	        
-	        Game.EventSystem.Publish(new EventType.AfterUnitCreate() {Unit = unit});
+            unit.AddComponent<MoveComponent>();
+            if (unitInfo.MoveInfo != null)
+            {
+                if (unitInfo.MoveInfo.X.Count > 0)
+                {
+                    using (ListComponent<Vector3> list = ListComponent<Vector3>.Create())
+                    {
+                        list.Add(unit.Position);
+                        for (int i = 0; i < unitInfo.MoveInfo.X.Count; ++i)
+                        {
+                            list.Add(new Vector3(unitInfo.MoveInfo.X[i], unitInfo.MoveInfo.Y[i], unitInfo.MoveInfo.Z[i]));
+                        }
+
+                        unit.MoveToAsync(list).Coroutine();
+                    }
+                }
+            }
+
+            unit.AddComponent<ObjectWait>();
+
+            unit.AddComponent<XunLuoPathComponent>();
+
+            Game.EventSystem.Publish(new EventType.AfterUnitCreate() { Unit = unit });
             return unit;
         }
+
+
+        public static Unit CreatPlayer(Entity domain, UnitInfo unitInfo)
+        {
+            UnitComponent unitComponent = domain.GetComponent<UnitComponent>();
+            Unit unit = unitComponent.AddChildWithId<Unit, int>(unitInfo.UnitId, unitInfo.ConfigId);
+            unit.UnitType = UnitType.Player;
+
+            unitComponent.Add(unit);
+            unit.AddComponent<MoveComponent>();
+            unit.Position = new Vector3(unitInfo.X, unitInfo.Y, unitInfo.Z);
+            unit.Forward = new Vector3(unitInfo.ForwardX, unitInfo.ForwardY, unitInfo.ForwardZ);
+
+            Game.EventSystem.Publish(new EventType.AfterUnitCreate() { Unit = unit });
+            return unit;
+        }
+
+        public static Unit CreatNPC(Entity domain, UnitInfo unitInfo)
+        {
+            UnitComponent unitComponent = domain.GetComponent<UnitComponent>();
+            Unit unit = unitComponent.AddChildWithId<Unit, int>(unitInfo.UnitId, unitInfo.ConfigId);
+            unit.UnitType = UnitType.NPC;
+
+            unitComponent.Add(unit);
+
+            unit.Position = new Vector3(unitInfo.X, unitInfo.Y, unitInfo.Z);
+            unit.Forward = new Vector3(unitInfo.ForwardX, unitInfo.ForwardY, unitInfo.ForwardZ);
+
+            Game.EventSystem.Publish(new EventType.AfterUnitCreate() { Unit = unit });
+            return unit;
+        }
+
+        public static Unit CreatMonster(Entity domain, UnitInfo unitInfo)
+        {
+            UnitComponent unitComponent = domain.GetComponent<UnitComponent>();
+            Unit unit = unitComponent.AddChildWithId<Unit, int>(unitInfo.UnitId, unitInfo.ConfigId);
+            unit.UnitType = UnitType.Monster;
+
+            unitComponent.AddComponent<MoveComponent>();
+            unitComponent.AddComponent<XunLuoPathComponent>();
+            unitComponent.Add(unit);
+            unit.Position = new Vector3(unitInfo.X, unitInfo.Y, unitInfo.Z);
+            unit.Forward = new Vector3(unitInfo.ForwardX, unitInfo.ForwardY, unitInfo.ForwardZ);
+
+            Game.EventSystem.Publish(new EventType.AfterUnitCreate() { Unit = unit });
+            return unit;
+        }
+
     }
 }
